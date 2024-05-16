@@ -1,3 +1,46 @@
+//! # cw-into-event
+//! A derive macro make a sturct able to pass to functions like
+//! [`cosmwasm_std::Response::add_event`](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.Response.html#method.add_event).
+//!
+//! ## Description
+//! [`IntoEvent`] is a derive macro implements `Into<cosmwasm_std::Event>`.
+//!
+//! This means structs with `#[derive(IntoEvent)]` can be passed to [`cosmwasm_std::Response::add_event`](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.Response.html#method.add_event) and other functions takes `impl Into<cosmwasm_std::Event>`.
+//!
+//! See [`IntoEvent`] for more details.
+//!
+//! ## Usage
+//! Add `#[derive(IntoEvent)]` to your struct.
+//!
+//! ```
+//! use cw_into_event::IntoEvent;
+//!
+//! #[derive(IntoEvent)]
+//! struct MyStruct {
+//!     string: String,
+//!     // `num.to_string()` is used to make the attribute's value
+//!     #[use_to_string]
+//!     num: u32,
+//!     // `String::from(address)` is used to make the attribute's value
+//!     #[to_string_fn(String::from)]
+//!     address: cosmwasm_std::Addr,
+//! }
+//!
+//! // test `MyStruct::into<cosmwasm_std::Event>`
+//! let my_struct = MyStruct {
+//!     string: "foo".to_string(),
+//!     num: 42,
+//!     address: cosmwasm_std::Addr::unchecked("bar"),
+//! };
+//! let my_event: cosmwasm_std::Event = my_struct.into();
+//! let expected = cosmwasm_std::Event::new("my_struct")
+//!     .add_attribute("string", "foo")
+//!     .add_attribute("num", "42")
+//!     .add_attribute("address", "bar");
+//! assert_eq!(expected, my_event);
+//! ```
+
+
 #[macro_use]
 extern crate syn;
 
@@ -9,7 +52,7 @@ use proc_macro::TokenStream;
 ///
 /// Structure:
 ///
-/// ```no_test
+/// ```ignore
 /// #[derive(IntoEvent)]
 /// struct MyStruct {
 ///     field1: type1,
@@ -31,7 +74,7 @@ use proc_macro::TokenStream;
 ///
 /// Output AST:
 ///
-/// ```no_test
+/// ```ignore
 /// impl Into<cosmwasm_std::Event> for MyStruct {
 ///     fn into(self) -> cosmwasm_std::Event {
 ///         cosmwasm_std::Event::new("my_struct")
