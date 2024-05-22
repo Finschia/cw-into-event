@@ -39,8 +39,6 @@
 //!     .add_attribute("address", "bar");
 //! assert_eq!(expected, my_event);
 //! ```
-
-
 #[macro_use]
 extern crate syn;
 
