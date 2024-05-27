@@ -1,7 +1,7 @@
 extern crate cw_into_event;
 
-use cw_into_event::IntoEvent;
 use cosmwasm_std::{attr, coins, Addr, Coin, Event};
+use cw_into_event::IntoEvent;
 
 fn coins_to_string(coins: Vec<Coin>) -> String {
     format!(
